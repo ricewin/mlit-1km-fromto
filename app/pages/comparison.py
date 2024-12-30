@@ -22,8 +22,6 @@ ss: SessionStateProxy = st.session_state
 
 def step_1() -> None:
     ss.pref, ss.city = region_builder()
-    # st.write(ss.pref, ss.city)
-    # st.write(ss.prefcode, ss.citycode)
 
 
 def step_2() -> None:
@@ -70,13 +68,8 @@ def step_2() -> None:
     with st.popover("1km メッシュ別の滞在人口データ"):
         st.info("1km メッシュ別に、いつ、何人が滞在したのかを収録したデータ")
 
-    df_2021 = ss.df_2021.copy()
-    df_2020 = ss.df_2020.copy()
-
     df_2021 = _filter(df_2021)
     df_2020 = _filter(df_2020)
-
-    # st.write(df_2021, df_2020)
 
     df_mesh: pd.DataFrame | Any = ss.df_mesh.copy()
 
@@ -84,14 +77,10 @@ def step_2() -> None:
     df_main = merge_df(
         df_2020, df_mesh, on="mesh1kmid", how="left", suffixes=("", "_drop"), drop=True
     )
-    # st.write(df_main)
 
-    # df_main: pd.DataFrame = df_main.dropna(subset=["population"])
     gdf_main: gpd.GeoDataFrame = make_polygons(df_main, "population")
-    # st.write(gdf_main)
 
     df_latlon: pd.DataFrame = df_main[["lat", "lon"]]
-    # st.write(df_latlon)
 
     # 差分
     df_diff: pd.DataFrame = merge_df(
@@ -102,24 +91,20 @@ def step_2() -> None:
         suffixes=("_2021", "_2020"),
         drop=False,
     )
-    # st.write(df_diff)
 
     # 増減率を計算して新しいカラムを追加
     df_diff["diff"] = df_diff["population_2021"] / df_diff["population_2020"] - 1
 
     # 不要なカラムを削除して最終的なデータフレームを作成
     df_diff = df_diff[["mesh1kmid", "diff"]]
-    # st.write(df_diff)
 
     # 前年同月増減率
     df_sub: pd.DataFrame = merge_df(
         df_diff, df_mesh, on="mesh1kmid", how="left", suffixes=("", "_drop"), drop=True
     )
-    # st.write(df_sub)
 
     df_sub = df_sub.dropna(subset=["diff"])
     gdf_sub: gpd.GeoDataFrame = make_polygons(df_sub, "diff")
-    # st.write(gdf_sub)
 
     with st.expander(f"*Geometry records: {len(gdf_main)}*"):
         st.caption("滞在人口")
