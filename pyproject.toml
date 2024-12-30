@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "mlit-1km-fromto"
+version = "0.1.0"
+description = ""
+authors = ["Ricewin <101691318+ricewin@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+streamlit = "^1.41.1"
+streamlit-folium = "^0.24.0"
+shapely = "^2.0.6"
+geopandas = "^1.0.1"
+branca = "^0.8.1"
+matplotlib = "^3.10.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
