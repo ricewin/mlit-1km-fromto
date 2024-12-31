@@ -35,24 +35,24 @@ def _unzip_csv(url: str) -> pd.DataFrame:
 def fetch_data(f: str, year: int) -> pd.DataFrame:
     ss: SessionStateProxy = st.session_state
 
-    path = "https://github.com/ricewin/mlit-1km-fromto/raw/refs/heads/main/"
+    path = "https://ricewin.blob.core.windows.net/assets/"
 
     if f == "mesh1km":
         if year == 2019:
-            path += "assets/attribute/attribute_mesh1km_2019.csv.zip"
+            path += "attribute/attribute_mesh1km_2019.csv.zip"
 
         else:
-            path += "assets/attribute/attribute_mesh1km_2020.csv.zip"
+            path += "attribute/attribute_mesh1km_2020.csv.zip"
 
     else:
         pcode = list(ss.pref)[0]
 
         if ss.set == "mdp":
-            path += f"assets/{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_mesh1km.csv.zip"
+            path += f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_mesh1km.csv.zip"
         elif ss.set == "fromto":
-            path += (
-                f"assets/{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
-            )
+            path += f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
+
+    path += st.secrets.azure_blob.sas_token
     return _unzip_csv(path)
 
 
