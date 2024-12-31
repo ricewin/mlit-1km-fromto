@@ -41,8 +41,8 @@ def step_2() -> None:
 
     # 市区町村を選択していたら絞り込む
     if len(ss.citycode) > 0:
-        ss.df_2021 = df_2021[df_2021["citycode"].isin(ss.citycode)]
-        ss.df_2020 = df_2020[df_2020["citycode"].isin(ss.citycode)]
+        df_2021 = df_2021[df_2021["citycode"].isin(ss.citycode)]
+        df_2020 = df_2020[df_2020["citycode"].isin(ss.citycode)]
 
     _sidebar_flag()
 

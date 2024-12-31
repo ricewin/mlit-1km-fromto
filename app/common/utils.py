@@ -35,7 +35,7 @@ def _unzip_csv(url: str) -> pd.DataFrame:
 def fetch_data(f: str, year: int) -> pd.DataFrame:
     ss: SessionStateProxy = st.session_state
 
-    path = "https://raw.githubusercontent.com/ricewin/mlit-1km-fromto/refs/heads/main/"
+    path = "https://github.com/ricewin/mlit-1km-fromto/raw/refs/heads/main/"
 
     if f == "mesh1km":
         if year == 2019:
