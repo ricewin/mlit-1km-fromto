@@ -96,22 +96,25 @@ def region_builder() -> tuple[None, None] | tuple[dict[Any, Any], dict[Any, Any]
 
     city_name = df[df["prefname"] == selected_prefecture]["cityname"].tolist()
 
-    with st.expander("市区町村を選択できます", expanded=True):
-        cities = st.pills(
-            "市区町村",
-            city_name,
-            selection_mode="multi",
-            default=city_name[0],
-            label_visibility="collapsed",
-        )
+    if selected_prefecture:
+        with st.expander("市区町村を選択できます", expanded=True):
+            cities = st.pills(
+                "市区町村",
+                city_name,
+                selection_mode="multi",
+                default=city_name[0],
+                label_visibility="collapsed",
+            )
 
-    city_data: list[dict[Hashable, Any]] = df[df["cityname"].isin(cities)][
-        ["citycode", "cityname"]
-    ].to_dict(orient="records")
+        city_data: list[dict[Hashable, Any]] = df[df["cityname"].isin(cities)][
+            ["citycode", "cityname"]
+        ].to_dict(orient="records")
 
-    city_dict: dict[Any, Any] = {
-        item["citycode"]: item["cityname"] for item in city_data
-    }
+        city_dict: dict[Any, Any] = {
+            item["citycode"]: item["cityname"] for item in city_data
+        }
+    else:
+        st.stop()
 
     return (
         pref_dict,
