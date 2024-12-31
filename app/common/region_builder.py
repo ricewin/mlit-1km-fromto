@@ -13,7 +13,7 @@ import streamlit as st
 @st.cache_data
 def _load_region() -> pd.DataFrame:
     return pd.read_csv(
-        "https://raw.githubusercontent.com/ricewin/mlit-1km-fromto/refs/heads/main/"
+        "https://github.com/ricewin/mlit-1km-fromto/raw/refs/heads/main/"
         "assets/regioncode_master_utf8_2020.csv"
     )
 
@@ -21,7 +21,7 @@ def _load_region() -> pd.DataFrame:
 @st.cache_data
 def _load_city() -> pd.DataFrame:
     return pd.read_csv(
-        "https://raw.githubusercontent.com/ricewin/mlit-1km-fromto/refs/heads/main/"
+        "https://github.com/ricewin/mlit-1km-fromto/raw/refs/heads/main/"
         "assets/prefcode_citycode_master_utf8_2020.csv"
     )
 
