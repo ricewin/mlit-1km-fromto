@@ -1,6 +1,6 @@
 # オープンデータ（人流データ）
 
-以下のデータセットは、G 空間情報センターにて提供されているコンテンツを利用しています。
+G 空間情報センターにて提供されているコンテンツを利用しています。
 
 - データセット
   - attribute
@@ -9,9 +9,9 @@
     - 都道府県コード、市区町村コードのマスタファイル
   - regioncode_master
     - 地方区分コードのマスタファイル
-  - monthly_mdp_mesh1km_XX
+  - monthly_mdp_mesh1km
     - 1km メッシュ別に、いつ、何人が滞在したのかを収録したデータ
-  - monthly_fromto_city_XX
+  - monthly_fromto_city
     - 市区町村別に、いつ、どこ（同市区町村／同都道府県／同地方／それ以外）から何人来たのかを収録したデータ
 
 Source: [全国の人流オープンデータ（1km メッシュ、市区町村単位発地別）](https://www.geospatial.jp/ckan/dataset/mlit-1km-fromto)
