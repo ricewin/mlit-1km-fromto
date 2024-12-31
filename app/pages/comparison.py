@@ -26,10 +26,6 @@ def step_1() -> None:
 
 def step_2() -> None:
     _dataset()
-
-    if ss.set == "mdp":
-        ss.df_mesh = fetch_data("mesh1km", 2020)
-
     _sidebar_date()
 
     # 年月の値を使ってデータを読み込む
@@ -54,8 +50,8 @@ def step_2() -> None:
             )
 
         # 絞り込み
-        df_2021 = _filter(ss.df_2021)
-        df_2020 = _filter(ss.df_2020)
+        df_2021 = _filter(df_2021)
+        df_2020 = _filter(df_2020)
 
         # 加工
         df_2021 = _datamap(df_2021)
@@ -71,6 +67,7 @@ def step_2() -> None:
     df_2021 = _filter(df_2021)
     df_2020 = _filter(df_2020)
 
+    ss.df_mesh = fetch_data("mesh1km", 2020)
     df_mesh: pd.DataFrame | Any = ss.df_mesh.copy()
 
     # 滞在人口
