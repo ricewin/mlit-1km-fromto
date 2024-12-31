@@ -13,7 +13,7 @@ class Const:
     timezone: dict[int, str] = {
         0: "昼",
         1: "深夜",
-        2: "全日",
+        2: "終日",
     }
 
     # 集計内容
