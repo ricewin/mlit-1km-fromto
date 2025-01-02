@@ -15,7 +15,6 @@ from streamlit.runtime.state.session_state_proxy import SessionStateProxy
 CONST = Const()
 dayflag: dict[int, str] = CONST.dayflag
 timezone: dict[int, str] = CONST.timezone
-dataset: dict[str, str] = CONST.dataset
 
 ss: SessionStateProxy = st.session_state
 
@@ -139,6 +138,7 @@ def _datamap(df):
 def _dataset() -> None:
     with st.sidebar:
         st.subheader("可視化対象", divider="orange")
+        dataset: dict[str, str] = CONST.dataset
         ss.set = st.segmented_control(
             "データセット",
             dataset,
