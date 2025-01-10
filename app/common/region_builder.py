@@ -58,7 +58,7 @@ def region_builder() -> tuple[None, None] | tuple[dict[Any, Any], dict[Any, Any]
     selected_region: str | None = st.pills("地域を選択してください", regions)
 
     if selected_region is None:
-        return None, None
+        st.stop()
 
     #     ██████╗ ██████╗ ███████╗███████╗███████╗ ██████╗████████╗██╗   ██╗██████╗ ███████╗███████╗
     #     ██╔══██╗██╔══██╗██╔════╝██╔════╝██╔════╝██╔════╝╚══██╔══╝██║   ██║██╔══██╗██╔════╝██╔════╝
@@ -71,7 +71,9 @@ def region_builder() -> tuple[None, None] | tuple[dict[Any, Any], dict[Any, Any]
         df_hokaido = _load_region("hokkaido")
         regions_hokkaido = df_hokaido["regionname"].unique()
         selected_region_hokkaido: str | None = st.pills(
-            "北海道の地域を選択してください", regions_hokkaido
+            "北海道の地域を選択してください",
+            regions_hokkaido,
+            default=regions_hokkaido[0],
         )
 
     prefectures = df[df["regionname"] == selected_region]["prefname"].tolist()
@@ -79,7 +81,11 @@ def region_builder() -> tuple[None, None] | tuple[dict[Any, Any], dict[Any, Any]
     if len(prefectures) == 1:
         selected_prefecture = prefectures[0]
     else:
-        selected_prefecture = st.pills("都道府県を選択してください", prefectures)
+        selected_prefecture = st.pills(
+            "都道府県を選択してください",
+            prefectures,
+            default=prefectures[0],
+        )
 
     pref_data = df[df["prefname"] == selected_prefecture][
         ["prefcode", "prefname"]
