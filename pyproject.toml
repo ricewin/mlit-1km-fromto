@@ -14,6 +14,13 @@ geopandas = "^1.0.1"
 branca = "^0.8.1"
 matplotlib = "^3.10.0"
 
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+
+[tool.poetry.packages]
+packages = [
+    { include = "mlit-1km-fromto" }
+]
 
 [build-system]
 requires = ["poetry-core"]

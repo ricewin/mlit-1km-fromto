@@ -1,4 +1,11 @@
-"""汎用関数"""
+"""
+#     ██╗   ██╗████████╗██╗██╗     ███████╗
+#     ██║   ██║╚══██╔══╝██║██║     ██╔════╝
+#     ██║   ██║   ██║   ██║██║     ███████╗
+#     ██║   ██║   ██║   ██║██║     ╚════██║
+#     ╚██████╔╝   ██║   ██║███████╗███████║
+#      ╚═════╝    ╚═╝   ╚═╝╚══════╝╚══════╝
+"""
 
 import zipfile
 from io import BytesIO
@@ -8,7 +15,6 @@ import pandas as pd
 import requests
 import streamlit as st
 from shapely.geometry import Polygon, box
-from shapely.wkt import loads
 from streamlit.runtime.state.session_state_proxy import SessionStateProxy
 
 
@@ -85,17 +91,15 @@ def make_polygons(df: pd.DataFrame, value: str) -> gpd.GeoDataFrame:
 
     Args:
         df (pd.DataFrame): メッシュコードを含むデータ.
+        value (str): 生成された GeoDataFrame に保持する列の名前.
 
     Returns:
         gpd.GeoDataFrame: ポリゴンを含むデータ.
     """
-    polygons: pd.Series[str] = df.apply(
-        lambda row: lonlat_to_polygon(
-            row["lon_min"], row["lat_min"], row["lon_max"], row["lat_max"]
-        ).wkt,
-        axis=1,
-    )
+    polygons: list[Polygon] = [
+        lonlat_to_polygon(*row)
+        for row in df[["lon_min", "lat_min", "lon_max", "lat_max"]].to_numpy()
+    ]
 
-    polygons = polygons.apply(loads)  # type: ignore
-
-    return gpd.GeoDataFrame(df[[value]], geometry=polygons)  # type: ignore
+    gdf = gpd.GeoDataFrame(df[[value]], geometry=polygons)  # type: ignore
+    return gdf
