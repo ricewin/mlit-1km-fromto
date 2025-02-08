@@ -66,7 +66,7 @@ def folium_map_builder(
         st.error("地図表示できません。")
         return
 
-    with st.spinner("Creating Map..."):
+    with st.spinner("Creating Map...", show_time=True):
         m = folium.plugins.DualMap(
             location=map_center,
             tiles=map_tile,
