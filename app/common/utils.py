@@ -30,8 +30,8 @@ def _unzip_csv(url: str) -> pd.DataFrame:
 
         for filename in file_list:
             if filename.endswith(".csv"):
-                with z.open(filename) as csvfile:
-                    df: pd.DataFrame = pd.read_csv(csvfile)
+                with z.open(filename) as csv_file:
+                    df: pd.DataFrame = pd.read_csv(csv_file)
                     # st.write(f"*CSV file: {filename}*")
                     # st.write(df.head())
 
