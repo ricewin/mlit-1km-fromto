@@ -68,8 +68,8 @@ def region_builder() -> tuple[None, None] | tuple[dict[Any, Any], dict[Any, Any]
     #     ╚═╝     ╚═╝  ╚═╝╚══════╝╚═╝     ╚══════╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝
 
     if selected_region == "北海道":
-        df_hokaido = _load_region("hokkaido")
-        regions_hokkaido = df_hokaido["regionname"].unique()
+        df_hokkaido = _load_region("hokkaido")
+        regions_hokkaido = df_hokkaido["regionname"].unique()
         selected_region_hokkaido: str | None = st.pills(
             "北海道の地域を選択してください",
             regions_hokkaido,
@@ -104,7 +104,7 @@ def region_builder() -> tuple[None, None] | tuple[dict[Any, Any], dict[Any, Any]
     df_city: pd.DataFrame = _load_region("city")
 
     if selected_region == "北海道":
-        city_name = df_hokaido[df_hokaido["regionname"] == selected_region_hokkaido][
+        city_name = df_hokkaido[df_hokkaido["regionname"] == selected_region_hokkaido][
             "cityname"
         ].tolist()
     else:
