@@ -26,8 +26,6 @@ def _unzip_csv(url: str) -> pd.DataFrame:
     with zipfile.ZipFile(f) as z:
         file_list: list[str] = z.namelist()
 
-        # st.write("ZIPファイル内のファイル:", file_list)
-
         for filename in file_list:
             if filename.endswith(".csv"):
                 with z.open(filename) as csv_file:
@@ -46,10 +44,8 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
     if f == "mesh1km":
         if year == 2019:
             path += "attribute/attribute_mesh1km_2019.csv.zip"
-
         else:
             path += "attribute/attribute_mesh1km_2020.csv.zip"
-
     else:
         pcode = list(ss.pref)[0]
 
@@ -96,10 +92,8 @@ def make_polygons(df: pd.DataFrame, value: str) -> gpd.GeoDataFrame:
     Returns:
         gpd.GeoDataFrame: ポリゴンを含むデータ.
     """
-    polygons: list[Polygon] = [
-        lonlat_to_polygon(*row)
-        for row in df[["lon_min", "lat_min", "lon_max", "lat_max"]].to_numpy()
-    ]
+    coords = df[["lon_min", "lat_min", "lon_max", "lat_max"]].to_numpy()
+    polygons = [lonlat_to_polygon(*row) for row in coords]
 
-    gdf = gpd.GeoDataFrame(df[[value]], geometry=polygons)  # type: ignore
+    gdf = gpd.GeoDataFrame(df[[value]].copy(), geometry=polygons)
     return gdf
