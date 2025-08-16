@@ -7,15 +7,15 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-streamlit = "^1.42.0"
+streamlit = "^1.48.0"
 streamlit-folium = "^0.24.0"
 shapely = "^2.0.6"
-geopandas = "^1.0.1"
+geopandas = "^1.1.0"
 branca = "^0.8.1"
 matplotlib = "^3.10.0"
 
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
 
 [build-system]
 requires = ["poetry-core"]
