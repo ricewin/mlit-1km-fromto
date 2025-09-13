@@ -14,7 +14,7 @@ import geopandas as gpd
 import pandas as pd
 import streamlit as st
 from folium.plugins import MiniMap
-from streamlit_folium import st_folium
+from streamlit.components.v1 import html
 
 
 def add_geojson_layer(map_object, gdf, value, colormap) -> None:
@@ -98,4 +98,5 @@ def folium_map_builder(
         folium.plugins.Fullscreen().add_to(m)  # type: ignore
         MiniMap(toggle_display=True, minimized=True).add_to(m.m2)
 
-        st_folium(m, use_container_width=True, returned_objects=[])
+        m_html = m.get_root().render()
+        html(m_html, height=600)

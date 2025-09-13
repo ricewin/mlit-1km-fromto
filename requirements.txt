@@ -1,6 +1,6 @@
-streamlit >= 1.42.0
+streamlit >= 1.48.0
 streamlit-folium >= 0.24.0
 shapely >= 2.0.6
-geopandas >= 1.0.1
+geopandas >= 1.1.1
 branca >= 0.8.1
 matplotlib >= 3.10.0

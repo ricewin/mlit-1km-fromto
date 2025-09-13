@@ -26,8 +26,6 @@ def _unzip_csv(url: str) -> pd.DataFrame:
     with zipfile.ZipFile(f) as z:
         file_list: list[str] = z.namelist()
 
-        # st.write("ZIPファイル内のファイル:", file_list)
-
         for filename in file_list:
             if filename.endswith(".csv"):
                 with z.open(filename) as csv_file:
@@ -41,15 +39,13 @@ def _unzip_csv(url: str) -> pd.DataFrame:
 def fetch_data(f: str, year: int) -> pd.DataFrame:
     ss: SessionStateProxy = st.session_state
 
-    path = "https://ricewin.blob.core.windows.net/assets/"
+    path = st.secrets.blob.url
 
     if f == "mesh1km":
         if year == 2019:
             path += "attribute/attribute_mesh1km_2019.csv.zip"
-
         else:
             path += "attribute/attribute_mesh1km_2020.csv.zip"
-
     else:
         pcode = list(ss.pref)[0]
 
@@ -58,7 +54,7 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
         elif ss.set == "fromto":
             path += f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
 
-    path += st.secrets.azure_blob.sas_token
+    path += st.secrets.blob.token
     return _unzip_csv(path)
 
 
@@ -96,10 +92,8 @@ def make_polygons(df: pd.DataFrame, value: str) -> gpd.GeoDataFrame:
     Returns:
         gpd.GeoDataFrame: ポリゴンを含むデータ.
     """
-    polygons: list[Polygon] = [
-        lonlat_to_polygon(*row)
-        for row in df[["lon_min", "lat_min", "lon_max", "lat_max"]].to_numpy()
-    ]
+    coords = df[["lon_min", "lat_min", "lon_max", "lat_max"]].to_numpy()
+    polygons = [lonlat_to_polygon(*row) for row in coords]
 
-    gdf = gpd.GeoDataFrame(df[[value]], geometry=polygons)  # type: ignore
+    gdf = gpd.GeoDataFrame(df[[value]].copy(), geometry=polygons)
     return gdf
