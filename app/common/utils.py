@@ -39,7 +39,7 @@ def _unzip_csv(url: str) -> pd.DataFrame:
 def fetch_data(f: str, year: int) -> pd.DataFrame:
     ss: SessionStateProxy = st.session_state
 
-    path = "https://ricewin.blob.core.windows.net/assets/"
+    path = st.secrets.blob.url
 
     if f == "mesh1km":
         if year == 2019:
@@ -54,7 +54,7 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
         elif ss.set == "fromto":
             path += f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
 
-    path += st.secrets.azure_blob.sas_token
+    path += st.secrets.blob.token
     return _unzip_csv(path)
 
 
