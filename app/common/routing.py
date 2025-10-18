@@ -34,3 +34,6 @@ def page_config() -> None:
         page_icon="🗾",
         layout="wide",
     )
+
+    with st.sidebar:
+        st.caption(f"*Streamlit Ver. {st.__version__}*")
