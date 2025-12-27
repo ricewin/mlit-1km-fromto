@@ -1,6 +1,6 @@
 # mlit-1km-fromto
 
-National open data on human flow (1km mesh, by municipality unit origin)
+Open data on human flow (1km mesh, by municipality unit origin)
 
 ---
 
@@ -14,9 +14,9 @@ ANNOUNCEMENT: This app uses open data content[^1].
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-## Streamlit folium Playground
+## Playground
 
-To generate a Folium map with Streamlit.
+Made with Streamlit.
 
 ### Streamlit Tutorial
 
