@@ -299,7 +299,8 @@ def maplibre_map_builder(
     
     try:
         df = df.dropna(subset=["lat", "lon"])
-        map_center: list[float] = [df["lon"].mean(), df["lat"].mean()]  # Note: maplibre uses [lon, lat]
+        # Convert to native Python types to avoid numpy type issues in HTML
+        map_center: list[float] = [float(df["lon"].mean()), float(df["lat"].mean())]  # Note: maplibre uses [lon, lat]
     except (KeyError, TypeError):
         st.error("地図表示できません。")
         return
