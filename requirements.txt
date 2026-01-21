@@ -4,3 +4,4 @@ shapely >= 2.0.6
 geopandas >= 1.1.1
 branca >= 0.8.1
 matplotlib >= 3.10.0
+maplibre >= 0.3.6
