@@ -18,6 +18,11 @@ ANNOUNCEMENT: This app uses open data content[^1].
 
 Made with Streamlit.
 
+### Mapping Libraries
+
+- Current: [Folium](https://python-visualization.github.io/folium/latest/)
+- Alternative: [MapLibre](https://maplibre.org/) - See [MAPLIBRE_MIGRATION.md](MAPLIBRE_MIGRATION.md) for migration investigation results
+
 ### Streamlit Tutorial
 
 Getting started: [30 Days of Streamlit](https://30days.streamlit.app/)

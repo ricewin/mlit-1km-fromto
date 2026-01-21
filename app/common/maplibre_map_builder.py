@@ -14,6 +14,14 @@ import streamlit as st
 from streamlit.components.v1 import html
 
 
+def format_tooltip(value: float, value_name: str, caption: str) -> str:
+    """Format tooltip text based on caption type."""
+    if caption == "増減率":
+        return f"{value_name}: {value:.2%}"
+    else:
+        return f"{value_name}: {value}"
+
+
 def create_dual_map_html(
     gdf_1: gpd.GeoDataFrame,
     gdf_2: gpd.GeoDataFrame,
@@ -37,15 +45,12 @@ def create_dual_map_html(
     gdf_2_copy['color'] = gdf_2_copy[value_2].apply(lambda x: colormap_2(x))
     
     # Add formatted tooltip values
-    if colormap_1.caption == "増減率":
-        gdf_1_copy['tooltip'] = gdf_1_copy[value_1].apply(lambda x: f"{value_1}: {x:.2%}")
-    else:
-        gdf_1_copy['tooltip'] = gdf_1_copy[value_1].apply(lambda x: f"{value_1}: {x}")
-    
-    if colormap_2.caption == "増減率":
-        gdf_2_copy['tooltip'] = gdf_2_copy[value_2].apply(lambda x: f"{value_2}: {x:.2%}")
-    else:
-        gdf_2_copy['tooltip'] = gdf_2_copy[value_2].apply(lambda x: f"{value_2}: {x}")
+    gdf_1_copy['tooltip'] = gdf_1_copy[value_1].apply(
+        lambda x: format_tooltip(x, value_1, colormap_1.caption)
+    )
+    gdf_2_copy['tooltip'] = gdf_2_copy[value_2].apply(
+        lambda x: format_tooltip(x, value_2, colormap_2.caption)
+    )
     
     # Convert to GeoJSON
     geojson_1 = json.dumps(gdf_1_copy.__geo_interface__)
@@ -299,8 +304,11 @@ def maplibre_map_builder(
     
     try:
         df = df.dropna(subset=["lat", "lon"])
-        # Convert to native Python types to avoid numpy type issues in HTML
-        map_center: list[float] = [float(df["lon"].mean()), float(df["lat"].mean())]  # Note: maplibre uses [lon, lat]
+        # IMPORTANT: Coordinate order difference between libraries
+        # - Folium uses: [lat, lon] (location parameter)
+        # - MapLibre uses: [lon, lat] (center parameter)
+        # This is a fundamental difference between the two libraries
+        map_center: list[float] = [float(df["lon"].mean()), float(df["lat"].mean())]
     except (KeyError, TypeError):
         st.error("地図表示できません。")
         return

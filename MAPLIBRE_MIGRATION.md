@@ -77,7 +77,15 @@ html_output = create_dual_map_html(
 - カスタムHTMLで`maplibre-gl-compare`ライブラリを使用
 - JavaScriptで左右のマップを作成し、Compareクラスで同期
 
-### 2. レンダリング方法
+### 2. 座標の順序 (Coordinate Order)
+
+**重要な違い:**
+- **Folium**: `[lat, lon]` 順序を使用 (location パラメータ)
+- **MapLibre**: `[lon, lat]` 順序を使用 (center パラメータ)
+
+この違いはコード内で明確にコメントされています。
+
+### 3. レンダリング方法
 
 **Folium:**
 ```python
@@ -92,7 +100,7 @@ html_output = create_dual_map_html(...)
 html(html_output, height=600)
 ```
 
-### 3. スタイリング
+### 4. スタイリング
 
 **Folium:**
 - `style_function`でスタイルを定義
@@ -101,6 +109,8 @@ html(html_output, height=600)
 **MapLibre:**
 - GeoJSONのpropertiesにカラー情報を追加
 - MapLibreの`['get', 'color']`式で参照
+
+**注意**: 現在の実装ではカラーマップのキャプションがハードコードされています（"滞在人口"と"増減率"）。より汎用的な実装にするには、これらをパラメータとして渡すことを検討してください。
 
 ## 利点 (Advantages)
 
