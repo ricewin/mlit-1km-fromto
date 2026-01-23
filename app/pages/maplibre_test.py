@@ -3,6 +3,7 @@ import geopandas as gpd
 import pandas as pd
 import streamlit as st
 from common.maplibre_map_builder import maplibre_map_builder
+from shapely.geometry import Point
 
 st.title("MapLibre Single Maps Test")
 st.write("Testing two separate MapLibre maps displayed side-by-side")
@@ -15,7 +16,6 @@ test_data = {
 df_test = pd.DataFrame(test_data)
 
 # Create simple GeoDataFrames with polygon data
-from shapely.geometry import Point
 
 # Create test geometries (simple buffers around points)
 gdf_1_data = []
