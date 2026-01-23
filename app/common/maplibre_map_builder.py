@@ -11,6 +11,9 @@ import branca.colormap as cm
 import geopandas as gpd
 import pandas as pd
 import streamlit as st
+from maplibre import Layer, LayerType, Map, MapOptions
+from maplibre.controls import NavigationControl, ScaleControl
+from maplibre.sources import GeoJSONSource
 from streamlit.components.v1 import html
 
 
@@ -22,17 +25,14 @@ def format_tooltip(value: float, value_name: str, caption: str) -> str:
         return f"{value_name}: {value}"
 
 
-def create_single_map_html(
+def create_single_map(
     gdf: gpd.GeoDataFrame,
     value: str,
     colormap,
-    map_center: list[float],
+    map_center: tuple[float, float],
     zoom_start: int,
-    map_id: str = "map"
-) -> str:
-    """Create a single map HTML using MapLibre GL JS."""
-    
-    import json
+) -> Map:
+    """Create a single map using maplibre Python package."""
     
     # Convert GeoDataFrame to GeoJSON and add colors to properties
     gdf_copy = gdf.copy()
@@ -45,139 +45,68 @@ def create_single_map_html(
         lambda x: format_tooltip(x, value, colormap.caption)
     )
     
-    # Convert to GeoJSON
-    geojson_data = json.dumps(gdf_copy.__geo_interface__)
+    # Create map with custom style for GSI tiles
+    map_options = MapOptions(
+        center=map_center,
+        zoom=zoom_start,
+        style={
+            "version": 8,
+            "sources": {
+                "gsi-pale": {
+                    "type": "raster",
+                    "tiles": ["https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png"],
+                    "tileSize": 256,
+                    "attribution": '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
+                }
+            },
+            "layers": [{
+                "id": "gsi-pale",
+                "type": "raster",
+                "source": "gsi-pale"
+            }]
+        },
+        min_zoom=9,
+        max_zoom=14,
+    )
     
-    single_map_html = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8">
-        <title>{colormap.caption}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
-        <link href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
-        <style>
-            body {{ margin: 0; padding: 0; }}
-            #{map_id} {{
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                width: 100%;
-            }}
-            .legend {{
-                background-color: white;
-                padding: 10px;
-                margin: 10px;
-                border-radius: 3px;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-                position: absolute;
-                bottom: 30px;
-                left: 10px;
-                z-index: 1;
-            }}
-            .maplibregl-popup {{
-                max-width: 200px;
-            }}
-            .maplibregl-popup-content {{
-                padding: 8px;
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-            }}
-        </style>
-    </head>
-    <body>
-        <div id="{map_id}"></div>
-        
-        <!-- Legend -->
-        <div class="legend">
-            <strong>{colormap.caption}</strong>
-        </div>
-        
-        <script>
-            var geojson = {geojson_data};
-
-            var map = new maplibregl.Map({{
-                container: '{map_id}',
-                style: {{
-                    version: 8,
-                    sources: {{
-                        'gsi-pale': {{
-                            type: 'raster',
-                            tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{{z}}/{{x}}/{{y}}.png'],
-                            tileSize: 256,
-                            attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
-                        }}
-                    }},
-                    layers: [{{
-                        id: 'gsi-pale',
-                        type: 'raster',
-                        source: 'gsi-pale'
-                    }}]
-                }},
-                center: {map_center},
-                zoom: {zoom_start},
-                minZoom: 9,
-                maxZoom: 14
-            }});
-
-            // Add GeoJSON layers when map is loaded
-            map.on('load', function() {{
-                map.addSource('geojson', {{
-                    type: 'geojson',
-                    data: geojson
-                }});
-                
-                map.addLayer({{
-                    id: 'geojson-fill',
-                    type: 'fill',
-                    source: 'geojson',
-                    paint: {{
-                        'fill-color': ['get', 'color'],
-                        'fill-opacity': 0.6
-                    }}
-                }});
-                
-                map.addLayer({{
-                    id: 'geojson-line',
-                    type: 'line',
-                    source: 'geojson',
-                    paint: {{
-                        'line-color': ['get', 'color'],
-                        'line-width': 1
-                    }}
-                }});
-                
-                // Add hover popup
-                var popup = new maplibregl.Popup({{
-                    closeButton: false,
-                    closeOnClick: false
-                }});
-                
-                map.on('mousemove', 'geojson-fill', function(e) {{
-                    map.getCanvas().style.cursor = 'pointer';
-                    var tooltip = e.features[0].properties.tooltip;
-                    popup.setLngLat(e.lngLat).setHTML(tooltip).addTo(map);
-                }});
-                
-                map.on('mouseleave', 'geojson-fill', function() {{
-                    map.getCanvas().style.cursor = '';
-                    popup.remove();
-                }});
-            }});
-
-            // Add navigation controls
-            map.addControl(new maplibregl.NavigationControl());
-            map.addControl(new maplibregl.ScaleControl());
-            map.addControl(new maplibregl.FullscreenControl());
-        </script>
-    </body>
-    </html>
-    """
+    m = Map(map_options)
     
-    return single_map_html
+    # Add GeoJSON source
+    geojson_source = GeoJSONSource(data=gdf_copy.__geo_interface__)
+    m.add_source("geojson", geojson_source)
+    
+    # Add fill layer
+    fill_layer = Layer(
+        id="geojson-fill",
+        type=LayerType.FILL,
+        source="geojson",
+        paint={
+            "fill-color": ["get", "color"],
+            "fill-opacity": 0.6
+        }
+    )
+    m.add_layer(fill_layer)
+    
+    # Add line layer for borders
+    line_layer = Layer(
+        id="geojson-line",
+        type=LayerType.LINE,
+        source="geojson",
+        paint={
+            "line-color": ["get", "color"],
+            "line-width": 1
+        }
+    )
+    m.add_layer(line_layer)
+    
+    # Add tooltip
+    m.add_tooltip("geojson-fill", "tooltip")
+    
+    # Add controls
+    m.add_control(NavigationControl())
+    m.add_control(ScaleControl())
+    
+    return m
 
 
 def maplibre_map_builder(
@@ -189,7 +118,7 @@ def maplibre_map_builder(
     zoom_start: int,
 ) -> None:
     """
-    Create two separate single maps using MapLibre displayed side-by-side in Streamlit.
+    Create two separate single maps using maplibre Python package displayed side-by-side in Streamlit.
 
     Args:
         df (pd.DataFrame): Include latlon.
@@ -206,7 +135,7 @@ def maplibre_map_builder(
         # - Folium uses: [lat, lon] (location parameter)
         # - MapLibre uses: [lon, lat] (center parameter)
         # This is a fundamental difference between the two libraries
-        map_center: list[float] = [float(df["lon"].mean()), float(df["lat"].mean())]
+        map_center: tuple[float, float] = (float(df["lon"].mean()), float(df["lat"].mean()))
     except (KeyError, TypeError):
         st.error("地図表示できません。")
         return
@@ -228,14 +157,10 @@ def maplibre_map_builder(
         
         with col1:
             st.subheader(colormap_1.caption)
-            map1_html = create_single_map_html(
-                gdf_1, value_1, colormap_1, map_center, zoom_start, "map1"
-            )
-            html(map1_html, height=500)
+            map1 = create_single_map(gdf_1, value_1, colormap_1, map_center, zoom_start)
+            html(map1.to_html(), height=500)
         
         with col2:
             st.subheader(colormap_2.caption)
-            map2_html = create_single_map_html(
-                gdf_2, value_2, colormap_2, map_center, zoom_start, "map2"
-            )
-            html(map2_html, height=500)
+            map2 = create_single_map(gdf_2, value_2, colormap_2, map_center, zoom_start)
+            html(map2.to_html(), height=500)
