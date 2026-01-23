@@ -4,8 +4,8 @@ import pandas as pd
 import streamlit as st
 from common.maplibre_map_builder import maplibre_map_builder
 
-st.title("MapLibre Dual Map Test")
-st.write("Testing the maplibre-based dual map implementation")
+st.title("MapLibre Single Maps Test")
+st.write("Testing two separate MapLibre maps displayed side-by-side")
 
 # Create simple test data
 test_data = {
@@ -21,18 +21,18 @@ from shapely.geometry import Point
 gdf_1_data = []
 gdf_2_data = []
 
-for i, row in df_test.iterrows():
-    point = Point(row['lon'], row['lat'])
+for row in df_test.itertuples():
+    point = Point(row.lon, row.lat)
     buffer = point.buffer(0.01)  # roughly 1km buffer
     
     gdf_1_data.append({
         'geometry': buffer,
-        'population': 100 + i * 50,
+        'population': 100 + row.Index * 50,
     })
     
     gdf_2_data.append({
         'geometry': buffer,
-        'diff': 0.1 + i * 0.05,
+        'diff': 0.1 + row.Index * 0.05,
     })
 
 gdf_1 = gpd.GeoDataFrame(gdf_1_data, crs='EPSG:4326')
@@ -51,7 +51,7 @@ try:
         'diff',
         zoom_start=12
     )
-    st.success("MapLibre dual map rendered successfully!")
+    st.success("MapLibre single maps rendered successfully!")
 except Exception as e:
     st.error(f"Error rendering map: {e}")
     import traceback

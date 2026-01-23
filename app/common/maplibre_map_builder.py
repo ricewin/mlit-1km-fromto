@@ -22,60 +22,44 @@ def format_tooltip(value: float, value_name: str, caption: str) -> str:
         return f"{value_name}: {value}"
 
 
-def create_dual_map_html(
-    gdf_1: gpd.GeoDataFrame,
-    gdf_2: gpd.GeoDataFrame,
-    value_1: str,
-    value_2: str,
-    colormap_1,
-    colormap_2,
+def create_single_map_html(
+    gdf: gpd.GeoDataFrame,
+    value: str,
+    colormap,
     map_center: list[float],
-    zoom_start: int
+    zoom_start: int,
+    map_id: str = "map"
 ) -> str:
-    """Create synchronized dual map HTML using maplibre-gl-compare."""
+    """Create a single map HTML using MapLibre GL JS."""
     
     import json
     
-    # Convert GeoDataFrames to GeoJSON and add colors to properties
-    gdf_1_copy = gdf_1.copy()
-    gdf_2_copy = gdf_2.copy()
+    # Convert GeoDataFrame to GeoJSON and add colors to properties
+    gdf_copy = gdf.copy()
     
     # Add color properties based on colormap
-    gdf_1_copy['color'] = gdf_1_copy[value_1].apply(lambda x: colormap_1(x))
-    gdf_2_copy['color'] = gdf_2_copy[value_2].apply(lambda x: colormap_2(x))
+    gdf_copy['color'] = gdf_copy[value].apply(lambda x: colormap(x))
     
     # Add formatted tooltip values
-    gdf_1_copy['tooltip'] = gdf_1_copy[value_1].apply(
-        lambda x: format_tooltip(x, value_1, colormap_1.caption)
-    )
-    gdf_2_copy['tooltip'] = gdf_2_copy[value_2].apply(
-        lambda x: format_tooltip(x, value_2, colormap_2.caption)
+    gdf_copy['tooltip'] = gdf_copy[value].apply(
+        lambda x: format_tooltip(x, value, colormap.caption)
     )
     
     # Convert to GeoJSON
-    geojson_1 = json.dumps(gdf_1_copy.__geo_interface__)
-    geojson_2 = json.dumps(gdf_2_copy.__geo_interface__)
+    geojson_data = json.dumps(gdf_copy.__geo_interface__)
     
-    dual_map_html = f"""
+    single_map_html = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <meta charset="utf-8">
-        <title>Dual Map Comparison</title>
+        <title>{colormap.caption}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.js"></script>
         <link href="https://unpkg.com/maplibre-gl@4.0.0/dist/maplibre-gl.css" rel="stylesheet" />
-        <script src="https://unpkg.com/maplibre-gl-compare@1.0.0/dist/maplibre-gl-compare.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/maplibre-gl-compare@1.0.0/dist/maplibre-gl-compare.css" type="text/css" />
         <style>
             body {{ margin: 0; padding: 0; }}
-            #comparison-container {{
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                width: 100%;
-            }}
-            .map {{
+            #{map_id} {{
                 position: absolute;
                 top: 0;
                 bottom: 0;
@@ -91,13 +75,8 @@ def create_dual_map_html(
                 font-size: 12px;
                 position: absolute;
                 bottom: 30px;
-                z-index: 1;
-            }}
-            .legend-left {{
                 left: 10px;
-            }}
-            .legend-right {{
-                right: 10px;
+                z-index: 1;
             }}
             .maplibregl-popup {{
                 max-width: 200px;
@@ -110,25 +89,18 @@ def create_dual_map_html(
         </style>
     </head>
     <body>
-        <div id="comparison-container">
-            <div id="before" class="map"></div>
-            <div id="after" class="map"></div>
-        </div>
+        <div id="{map_id}"></div>
         
-        <!-- Legends -->
-        <div class="legend legend-left">
-            <strong>{colormap_1.caption}</strong>
-        </div>
-        <div class="legend legend-right">
-            <strong>{colormap_2.caption}</strong>
+        <!-- Legend -->
+        <div class="legend">
+            <strong>{colormap.caption}</strong>
         </div>
         
         <script>
-            var geojson1 = {geojson_1};
-            var geojson2 = {geojson_2};
+            var geojson = {geojson_data};
 
-            var beforeMap = new maplibregl.Map({{
-                container: 'before',
+            var map = new maplibregl.Map({{
+                container: '{map_id}',
                 style: {{
                     version: 8,
                     sources: {{
@@ -151,51 +123,27 @@ def create_dual_map_html(
                 maxZoom: 14
             }});
 
-            var afterMap = new maplibregl.Map({{
-                container: 'after',
-                style: {{
-                    version: 8,
-                    sources: {{
-                        'gsi-pale': {{
-                            type: 'raster',
-                            tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{{z}}/{{x}}/{{y}}.png'],
-                            tileSize: 256,
-                            attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
-                        }}
-                    }},
-                    layers: [{{
-                        id: 'gsi-pale',
-                        type: 'raster',
-                        source: 'gsi-pale'
-                    }}]
-                }},
-                center: {map_center},
-                zoom: {zoom_start},
-                minZoom: 9,
-                maxZoom: 14
-            }});
-
-            // Add GeoJSON layers when maps are loaded
-            beforeMap.on('load', function() {{
-                beforeMap.addSource('geojson1', {{
+            // Add GeoJSON layers when map is loaded
+            map.on('load', function() {{
+                map.addSource('geojson', {{
                     type: 'geojson',
-                    data: geojson1
+                    data: geojson
                 }});
                 
-                beforeMap.addLayer({{
-                    id: 'geojson1-fill',
+                map.addLayer({{
+                    id: 'geojson-fill',
                     type: 'fill',
-                    source: 'geojson1',
+                    source: 'geojson',
                     paint: {{
                         'fill-color': ['get', 'color'],
                         'fill-opacity': 0.6
                     }}
                 }});
                 
-                beforeMap.addLayer({{
-                    id: 'geojson1-line',
+                map.addLayer({{
+                    id: 'geojson-line',
                     type: 'line',
-                    source: 'geojson1',
+                    source: 'geojson',
                     paint: {{
                         'line-color': ['get', 'color'],
                         'line-width': 1
@@ -203,83 +151,33 @@ def create_dual_map_html(
                 }});
                 
                 // Add hover popup
-                var popup1 = new maplibregl.Popup({{
+                var popup = new maplibregl.Popup({{
                     closeButton: false,
                     closeOnClick: false
                 }});
                 
-                beforeMap.on('mousemove', 'geojson1-fill', function(e) {{
-                    beforeMap.getCanvas().style.cursor = 'pointer';
+                map.on('mousemove', 'geojson-fill', function(e) {{
+                    map.getCanvas().style.cursor = 'pointer';
                     var tooltip = e.features[0].properties.tooltip;
-                    popup1.setLngLat(e.lngLat).setHTML(tooltip).addTo(beforeMap);
+                    popup.setLngLat(e.lngLat).setHTML(tooltip).addTo(map);
                 }});
                 
-                beforeMap.on('mouseleave', 'geojson1-fill', function() {{
-                    beforeMap.getCanvas().style.cursor = '';
-                    popup1.remove();
-                }});
-            }});
-
-            afterMap.on('load', function() {{
-                afterMap.addSource('geojson2', {{
-                    type: 'geojson',
-                    data: geojson2
-                }});
-                
-                afterMap.addLayer({{
-                    id: 'geojson2-fill',
-                    type: 'fill',
-                    source: 'geojson2',
-                    paint: {{
-                        'fill-color': ['get', 'color'],
-                        'fill-opacity': 0.6
-                    }}
-                }});
-                
-                afterMap.addLayer({{
-                    id: 'geojson2-line',
-                    type: 'line',
-                    source: 'geojson2',
-                    paint: {{
-                        'line-color': ['get', 'color'],
-                        'line-width': 1
-                    }}
-                }});
-                
-                // Add hover popup
-                var popup2 = new maplibregl.Popup({{
-                    closeButton: false,
-                    closeOnClick: false
-                }});
-                
-                afterMap.on('mousemove', 'geojson2-fill', function(e) {{
-                    afterMap.getCanvas().style.cursor = 'pointer';
-                    var tooltip = e.features[0].properties.tooltip;
-                    popup2.setLngLat(e.lngLat).setHTML(tooltip).addTo(afterMap);
-                }});
-                
-                afterMap.on('mouseleave', 'geojson2-fill', function() {{
-                    afterMap.getCanvas().style.cursor = '';
-                    popup2.remove();
+                map.on('mouseleave', 'geojson-fill', function() {{
+                    map.getCanvas().style.cursor = '';
+                    popup.remove();
                 }});
             }});
 
             // Add navigation controls
-            beforeMap.addControl(new maplibregl.NavigationControl());
-            afterMap.addControl(new maplibregl.NavigationControl());
-            afterMap.addControl(new maplibregl.ScaleControl());
-            
-            // Add fullscreen control
-            beforeMap.addControl(new maplibregl.FullscreenControl());
-
-            // Create comparison
-            var compare = new maplibregl.Compare(beforeMap, afterMap, '#comparison-container');
+            map.addControl(new maplibregl.NavigationControl());
+            map.addControl(new maplibregl.ScaleControl());
+            map.addControl(new maplibregl.FullscreenControl());
         </script>
     </body>
     </html>
     """
     
-    return dual_map_html
+    return single_map_html
 
 
 def maplibre_map_builder(
@@ -291,12 +189,12 @@ def maplibre_map_builder(
     zoom_start: int,
 ) -> None:
     """
-    Create dual map using maplibre.
+    Create two separate single maps using MapLibre displayed side-by-side in Streamlit.
 
     Args:
         df (pd.DataFrame): Include latlon.
-        gdf_1 (gpd.GeoDataFrame): Left map.
-        gdf_2 (gpd.GeoDataFrame): Right map.
+        gdf_1 (gpd.GeoDataFrame): First map data.
+        gdf_2 (gpd.GeoDataFrame): Second map data.
         value_1 (str): Value 1.
         value_2 (str): Value 2.
         zoom_start (int): Zoom start level.
@@ -313,7 +211,7 @@ def maplibre_map_builder(
         st.error("地図表示できません。")
         return
 
-    with st.spinner("Creating Map...", show_time=True):
+    with st.spinner("Creating Maps...", show_time=True):
         # Create colormaps
         colormap_1 = cm.linear.Paired_06.scale(  # type: ignore
             gdf_1[value_1].min(), gdf_1[value_1].max()
@@ -325,13 +223,19 @@ def maplibre_map_builder(
         )
         colormap_2.caption = "増減率"
 
-        # Create dual map HTML
-        dual_html = create_dual_map_html(
-            gdf_1, gdf_2,
-            value_1, value_2,
-            colormap_1, colormap_2,
-            map_center,
-            zoom_start
-        )
+        # Create two columns for side-by-side display
+        col1, col2 = st.columns(2)
         
-        html(dual_html, height=600)
+        with col1:
+            st.subheader(colormap_1.caption)
+            map1_html = create_single_map_html(
+                gdf_1, value_1, colormap_1, map_center, zoom_start, "map1"
+            )
+            html(map1_html, height=500)
+        
+        with col2:
+            st.subheader(colormap_2.caption)
+            map2_html = create_single_map_html(
+                gdf_2, value_2, colormap_2, map_center, zoom_start, "map2"
+            )
+            html(map2_html, height=500)
