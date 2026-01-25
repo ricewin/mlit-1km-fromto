@@ -13,6 +13,7 @@ geopandas = "^1.1.0"
 branca = "^0.8.1"
 matplotlib = "^3.10.0"
 folium = "^0.20.0"
+maplibre = "^0.3.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"
