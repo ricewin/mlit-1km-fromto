@@ -59,19 +59,19 @@ def create_single_map(
                         "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png"
                     ],
                     "tileSize": 256,
-                    "attribution": '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>',
+                    "attribution": '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer">地理院タイル</a>',
                 }
             },
             "layers": [{"id": "gsi-pale", "type": "raster", "source": "gsi-pale"}],
         },
         min_zoom=9,
         max_zoom=14,
-    )  # pyright: ignore[reportCallIssue]
+    )
 
     m = Map(map_options)
 
     # Add GeoJSON source
-    geojson_source = GeoJSONSource(data=gdf_copy.__geo_interface__)  # pyright: ignore[reportCallIssue]
+    geojson_source = GeoJSONSource(data=gdf_copy.__geo_interface__)
     m.add_source("geojson", geojson_source)
 
     # Add fill layer
@@ -80,7 +80,7 @@ def create_single_map(
         type=LayerType.FILL,
         source="geojson",
         paint={"fill-color": ["get", "color"], "fill-opacity": 0.6},
-    )  # pyright: ignore[reportCallIssue]
+    )
     m.add_layer(fill_layer)
 
     # Add line layer for borders
@@ -89,15 +89,15 @@ def create_single_map(
         type=LayerType.LINE,
         source="geojson",
         paint={"line-color": ["get", "color"], "line-width": 1},
-    )  # pyright: ignore[reportCallIssue]
+    )
     m.add_layer(line_layer)
 
     # Add tooltip
     m.add_tooltip("geojson-fill", "tooltip")
 
     # Add controls
-    m.add_control(NavigationControl())  # pyright: ignore[reportCallIssue]
-    m.add_control(ScaleControl())  # pyright: ignore[reportCallIssue]
+    m.add_control(NavigationControl())
+    m.add_control(ScaleControl())
 
     return m
 
