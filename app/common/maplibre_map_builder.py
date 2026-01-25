@@ -14,7 +14,7 @@ import streamlit as st
 from maplibre import Layer, LayerType, Map, MapOptions
 from maplibre.controls import NavigationControl, ScaleControl
 from maplibre.sources import GeoJSONSource
-from streamlit.components.v1 import html
+from maplibre.streamlit import st_maplibre
 
 
 def format_tooltip(value: float, value_name: str, caption: str) -> str:
@@ -158,9 +158,9 @@ def maplibre_map_builder(
         with col1:
             st.subheader(colormap_1.caption)
             map1 = create_single_map(gdf_1, value_1, colormap_1, map_center, zoom_start)
-            html(map1.to_html(), height=500)
+            st_maplibre(map1, height=500)
         
         with col2:
             st.subheader(colormap_2.caption)
             map2 = create_single_map(gdf_2, value_2, colormap_2, map_center, zoom_start)
-            html(map2.to_html(), height=500)
+            st_maplibre(map2, height=500)
