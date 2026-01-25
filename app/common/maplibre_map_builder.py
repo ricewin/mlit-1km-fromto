@@ -59,7 +59,7 @@ def create_single_map(
                         "https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png"
                     ],
                     "tileSize": 256,
-                    "attribution": '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>',
+                    "attribution": '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener noreferrer">地理院タイル</a>',
                 }
             },
             "layers": [{"id": "gsi-pale", "type": "raster", "source": "gsi-pale"}],
