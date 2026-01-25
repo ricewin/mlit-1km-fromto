@@ -57,29 +57,31 @@ with col2:
 
 ## 機能比較 (Feature Comparison)
 
-| 機能 | Folium | MapLibre | 状態 |
-|------|--------|----------|------|
-| サイドバイサイド表示 | ✅ DualMap plugin | ✅ st.columns(2) | 実装済み |
-| GeoJSONレイヤー | ✅ folium.GeoJson | ✅ addSource/addLayer | 実装済み |
-| カラーマップ | ✅ branca | ✅ branca | 実装済み |
-| ツールチップ | ✅ tooltip | ✅ add_tooltip() | 実装済み |
-| ナビゲーション | ✅ 自動 | ✅ NavigationControl | 実装済み |
-| スケール | ✅ control_scale | ✅ ScaleControl | 実装済み |
-| カスタムタイル | ✅ tiles param | ✅ raster source | 実装済み |
-| マップ同期 | ✅ 自動同期 | ❌ 未実装 | 独立したマップ |
-| フルスクリーン | ✅ Fullscreen plugin | ❌ 未実装 | 必要に応じて実装可能 |
-| ミニマップ | ✅ MiniMap plugin | ❌ 未実装 | 必要に応じて実装可能 |
-| 凡例表示 | ✅ colormap.add_to() | ⚠️ キャプションのみ | st.subheaderで表示 |
+| 機能                 | Folium               | MapLibre              | 状態                 |
+| -------------------- | -------------------- | --------------------- | -------------------- |
+| サイドバイサイド表示 | ✅ DualMap plugin    | ✅ st.columns(2)      | 実装済み             |
+| GeoJSONレイヤー      | ✅ folium.GeoJson    | ✅ addSource/addLayer | 実装済み             |
+| カラーマップ         | ✅ branca            | ✅ branca             | 実装済み             |
+| ツールチップ         | ✅ tooltip           | ✅ add_tooltip()      | 実装済み             |
+| ナビゲーション       | ✅ 自動              | ✅ NavigationControl  | 実装済み             |
+| スケール             | ✅ control_scale     | ✅ ScaleControl       | 実装済み             |
+| カスタムタイル       | ✅ tiles param       | ✅ raster source      | 実装済み             |
+| マップ同期           | ✅ 自動同期          | ❌ 未実装             | 独立したマップ       |
+| フルスクリーン       | ✅ Fullscreen plugin | ❌ 未実装             | 必要に応じて実装可能 |
+| ミニマップ           | ✅ MiniMap plugin    | ❌ 未実装             | 必要に応じて実装可能 |
+| 凡例表示             | ✅ colormap.add_to() | ⚠️ キャプションのみ   | st.subheaderで表示   |
 
 ## 主な変更点 (Key Changes)
 
 ### 1. デュアルマップの実装方法
 
 **Folium:**
+
 - `folium.plugins.DualMap`を使用
 - 左右のマップが自動的に同期
 
 **MapLibre:**
+
 - 2つの独立した`Map`インスタンスを作成
 - `st.columns(2)`で左右に並べて表示
 - マップ同期は未実装（独立して操作可能）
@@ -87,6 +89,7 @@ with col2:
 ### 2. 座標の順序 (Coordinate Order)
 
 **重要な違い:**
+
 - **Folium**: `[lat, lon]` 順序を使用 (location パラメータ)
 - **MapLibre**: `[lon, lat]` 順序を使用 (center パラメータ)
 
@@ -95,6 +98,7 @@ with col2:
 ### 3. レンダリング方法
 
 **Folium:**
+
 ```python
 m = folium.plugins.DualMap(...)
 m_html = m.get_root().render()
@@ -102,6 +106,7 @@ html(m_html, height=600)
 ```
 
 **MapLibre:**
+
 ```python
 map1 = create_single_map(...)
 map2 = create_single_map(...)
@@ -116,10 +121,12 @@ with col2:
 ### 4. スタイリング
 
 **Folium:**
+
 - `style_function`でスタイルを定義
 - Pythonでカラーを計算
 
 **MapLibre:**
+
 - GeoJSONのpropertiesにカラー情報を追加
 - MapLibreの`['get', 'color']`式で参照
 - maplibre Python APIを使用してPythonのみで実装
