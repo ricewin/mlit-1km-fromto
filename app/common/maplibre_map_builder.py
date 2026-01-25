@@ -66,12 +66,12 @@ def create_single_map(
         },
         min_zoom=9,
         max_zoom=14,
-    )  # pyright: ignore[reportCallIssue]
+    )  # pyright: ignore[reportCallIssue] - MapLibre型情報の制限
 
     m = Map(map_options)
 
     # Add GeoJSON source
-    geojson_source = GeoJSONSource(data=gdf_copy.__geo_interface__)  # pyright: ignore[reportCallIssue]
+    geojson_source = GeoJSONSource(data=gdf_copy.__geo_interface__)  # pyright: ignore[reportCallIssue] - MapLibre型情報の制限
     m.add_source("geojson", geojson_source)
 
     # Add fill layer
@@ -80,7 +80,7 @@ def create_single_map(
         type=LayerType.FILL,
         source="geojson",
         paint={"fill-color": ["get", "color"], "fill-opacity": 0.6},
-    )  # pyright: ignore[reportCallIssue]
+    )  # pyright: ignore[reportCallIssue] - MapLibre型情報の制限
     m.add_layer(fill_layer)
 
     # Add line layer for borders
@@ -89,15 +89,15 @@ def create_single_map(
         type=LayerType.LINE,
         source="geojson",
         paint={"line-color": ["get", "color"], "line-width": 1},
-    )  # pyright: ignore[reportCallIssue]
+    )  # pyright: ignore[reportCallIssue] - MapLibre型情報の制限
     m.add_layer(line_layer)
 
     # Add tooltip
     m.add_tooltip("geojson-fill", "tooltip")
 
     # Add controls
-    m.add_control(NavigationControl())  # pyright: ignore[reportCallIssue]
-    m.add_control(ScaleControl())  # pyright: ignore[reportCallIssue]
+    m.add_control(NavigationControl())  # pyright: ignore[reportCallIssue] - MapLibre型情報の制限
+    m.add_control(ScaleControl())  # pyright: ignore[reportCallIssue] - MapLibre型情報の制限
 
     return m
 
@@ -138,12 +138,12 @@ def maplibre_map_builder(
 
     with st.spinner("Creating Maps...", show_time=True):
         # Create colormaps
-        colormap_1 = cm.linear.Paired_06.scale(  # type: ignore
+        colormap_1 = cm.linear.Paired_06.scale(  # pyright: ignore[reportAttributeAccessIssue]
             gdf_1[value_1].min(), gdf_1[value_1].max()
         )
         colormap_1.caption = "滞在人口"
 
-        colormap_2 = cm.linear.Accent_06.scale(  # type: ignore
+        colormap_2 = cm.linear.Accent_06.scale(  # pyright: ignore[reportAttributeAccessIssue]
             gdf_2[value_2].min(), gdf_2[value_2].max()
         )
         colormap_2.caption = "増減率"

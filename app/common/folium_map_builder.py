@@ -77,7 +77,7 @@ def folium_map_builder(
             control_scale=True,
         )
 
-        colormap_1 = cm.linear.Paired_06.scale(  # type: ignore
+        colormap_1 = cm.linear.Paired_06.scale(  # pyright: ignore[reportAttributeAccessIssue]
             gdf_1[value_1].min(), gdf_1[value_1].max()
         )
         colormap_1.caption = "滞在人口"
@@ -87,7 +87,7 @@ def folium_map_builder(
 
         add_geojson_layer(m.m1, gdf_1, value_1, colormap_1)
 
-        colormap_2 = cm.linear.Accent_06.scale(  # type: ignore
+        colormap_2 = cm.linear.Accent_06.scale(  # pyright: ignore[reportAttributeAccessIssue]
             gdf_2[value_2].min(), gdf_2[value_2].max()
         )
         colormap_2.caption = "増減率"
@@ -95,7 +95,7 @@ def folium_map_builder(
 
         add_geojson_layer(m.m2, gdf_2, value_2, colormap_2)
 
-        folium.plugins.Fullscreen().add_to(m)  # type: ignore
+        folium.plugins.Fullscreen().add_to(m)
         MiniMap(toggle_display=True, minimized=True).add_to(m.m2)
 
         m_html = m.get_root().render()
