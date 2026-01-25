@@ -11,7 +11,8 @@ import branca.colormap as cm
 import geopandas as gpd
 import pandas as pd
 import streamlit as st
-from maplibre import Layer, LayerType, Map, MapOptions
+from maplibre.layer import Layer, LayerType
+from maplibre.map import Map, MapOptions
 from maplibre.controls import NavigationControl, ScaleControl
 from maplibre.sources import GeoJSONSource
 from maplibre.streamlit import st_maplibre
