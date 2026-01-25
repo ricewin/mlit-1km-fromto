@@ -2,7 +2,7 @@
 
 ## Folium vs MapLibre Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Current (Folium)                              │
 ├─────────────────────────────────────────────────────────────────┤
@@ -53,7 +53,7 @@
 
 ## Data Flow
 
-```
+```text
 ┌─────────────────┐
 │  DataFrame      │
 │  (lat, lon)     │
@@ -112,7 +112,7 @@
 ```python
 def format_tooltip(value, value_name, caption):
     # Helper function for tooltip formatting
-    
+
 def create_single_map(gdf, value, colormap, map_center, zoom_start):
     # Create a single map using maplibre Python package
     # - Create Map with MapOptions
@@ -121,7 +121,7 @@ def create_single_map(gdf, value, colormap, map_center, zoom_start):
     # - Add tooltip
     # - Add NavigationControl and ScaleControl
     # Returns Map object
-    
+
 def maplibre_map_builder(df, gdf_1, gdf_2, ...):
     # Main entry point
     # - Calculate map center
@@ -133,6 +133,7 @@ def maplibre_map_builder(df, gdf_1, gdf_2, ...):
 ### 2. Rendering (No JavaScript Layer)
 
 The implementation uses the maplibre Python package exclusively:
+
 - No custom HTML generation
 - No JavaScript code
 - Uses `st_maplibre()` from `maplibre.streamlit` for rendering
@@ -140,19 +141,19 @@ The implementation uses the maplibre Python package exclusively:
 
 ## Feature Mapping
 
-| Feature | Folium | MapLibre | Notes |
-|---------|--------|----------|-------|
-| Map initialization | `folium.DualMap()` | `Map(MapOptions())` x2 | Two separate instances |
-| Synchronization | Built-in | None | Maps are independent |
-| GeoJSON | `folium.GeoJson()` | `add_source() + add_layer()` | More control |
-| Styling | `style_function` | Data-driven expressions | Properties-based |
-| Tooltips | `tooltip` parameter | `add_tooltip()` method | Built into Map class |
-| Controls | Auto + plugins | `add_control()` method | Manual addition |
-| Rendering | `m.get_root().render()` | `st_maplibre(map)` | Streamlit component |
+| Feature            | Folium                  | MapLibre                     | Notes                  |
+| ------------------ | ----------------------- | ---------------------------- | ---------------------- |
+| Map initialization | `folium.DualMap()`      | `Map(MapOptions())` x2       | Two separate instances |
+| Synchronization    | Built-in                | None                         | Maps are independent   |
+| GeoJSON            | `folium.GeoJson()`      | `add_source() + add_layer()` | More control           |
+| Styling            | `style_function`        | Data-driven expressions      | Properties-based       |
+| Tooltips           | `tooltip` parameter     | `add_tooltip()` method       | Built into Map class   |
+| Controls           | Auto + plugins          | `add_control()` method       | Manual addition        |
+| Rendering          | `m.get_root().render()` | `st_maplibre(map)`           | Streamlit component    |
 
 ## Performance Characteristics
 
-```
+```text
 Folium:
 - Server-side rendering
 - Python generates all HTML
@@ -161,7 +162,7 @@ Folium:
 - Auto-synchronized maps
 
 MapLibre:
-- Client-side rendering  
+- Client-side rendering
 - WebGL acceleration
 - Smaller payload (JSON data)
 - Excellent for large datasets
@@ -171,7 +172,7 @@ MapLibre:
 
 ## Coordinate System Difference
 
-```
+```text
 Folium:     [lat, lon]  e.g., [35.681, 139.767]
             ↕
 MapLibre:   [lon, lat]  e.g., [139.767, 35.681]
@@ -186,6 +187,7 @@ This is clearly documented in the code with comments.
 ### Current Implementation Features
 
 **Implemented:**
+
 - ✅ Two separate single maps displayed side-by-side
 - ✅ GSI tile layer (地理院タイル)
 - ✅ GeoJSON rendering with color styling
@@ -196,6 +198,7 @@ This is clearly documented in the code with comments.
 - ✅ Caption display (via st.subheader)
 
 **Not Implemented:**
+
 - ❌ Map synchronization (maps are independent)
 - ❌ Fullscreen control
 - ❌ Visual colormap legend on maps
