@@ -66,12 +66,12 @@ def create_single_map(
         },
         min_zoom=9,
         max_zoom=14,
-    )
+    )  # type: ignore
 
     m = Map(map_options)
 
     # Add GeoJSON source
-    geojson_source = GeoJSONSource(data=gdf_copy.__geo_interface__)
+    geojson_source = GeoJSONSource(data=gdf_copy.__geo_interface__)  # type: ignore
     m.add_source("geojson", geojson_source)
 
     # Add fill layer
@@ -80,7 +80,7 @@ def create_single_map(
         type=LayerType.FILL,
         source="geojson",
         paint={"fill-color": ["get", "color"], "fill-opacity": 0.6},
-    )
+    )  # type: ignore
     m.add_layer(fill_layer)
 
     # Add line layer for borders
@@ -89,15 +89,15 @@ def create_single_map(
         type=LayerType.LINE,
         source="geojson",
         paint={"line-color": ["get", "color"], "line-width": 1},
-    )
+    )  # type: ignore
     m.add_layer(line_layer)
 
     # Add tooltip
     m.add_tooltip("geojson-fill", "tooltip")
 
     # Add controls
-    m.add_control(NavigationControl())
-    m.add_control(ScaleControl())
+    m.add_control(NavigationControl())  # type: ignore
+    m.add_control(ScaleControl())  # type: ignore
 
     return m
 
