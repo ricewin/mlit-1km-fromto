@@ -21,7 +21,7 @@ Made with Streamlit.
 ### Mapping Libraries
 
 - Current: [Folium](https://python-visualization.github.io/folium/latest/)
-- Alternative: [MapLibre](https://maplibre.org/) - See [MAPLIBRE_MIGRATION.md](MAPLIBRE_MIGRATION.md) for migration investigation results
+- Alternative: [MapLibre](https://maplibre.org/) - See [MAPLIBRE_MIGRATION.md](docs/Investigation_maplibre/MAPLIBRE_MIGRATION.md) for migration investigation results
 
 ### Streamlit Tutorial
 
