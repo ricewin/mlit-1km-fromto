@@ -8,7 +8,7 @@ FoliumからMapLibreへの移行可能性の調査結果をまとめました。
 
 ### ✅ 移行可能 (Migration is Feasible)
 
-現在のデュアルマップ機能を維持したまま、FoliumからMapLibreに置き換えることができます。
+FoliumからMapLibreに置き換えることができます。現在の実装では2つの独立したマップをStreamlitのカラムで並べて表示します。
 
 ## 実装比較 (Implementation Comparison)
 
@@ -38,32 +38,38 @@ m_html = m.get_root().render()
 
 ```python
 # maplibre_map_builder.py
-import maplibre
+from maplibre import Map, MapOptions, Layer, LayerType
+from maplibre.sources import GeoJSONSource
+from maplibre.streamlit import st_maplibre
+import streamlit as st
 
-# カスタムHTMLを生成してmaplibre-gl-compareライブラリを使用
-# maplibre-gl-compareでデュアルマップを実装
+# 2つの独立したマップを作成
+map1 = create_single_map(gdf_1, value_1, colormap_1, map_center, zoom_start)
+map2 = create_single_map(gdf_2, value_2, colormap_2, map_center, zoom_start)
 
-html_output = create_dual_map_html(
-    gdf_1, gdf_2,
-    value_1, value_2,
-    colormap_1, colormap_2,
-    map_center, zoom_start
-)
+# Streamlitのカラムで並べて表示
+col1, col2 = st.columns(2)
+with col1:
+    st_maplibre(map1, height=500)
+with col2:
+    st_maplibre(map2, height=500)
 ```
 
 ## 機能比較 (Feature Comparison)
 
 | 機能 | Folium | MapLibre | 状態 |
 |------|--------|----------|------|
-| デュアルマップ | ✅ DualMap plugin | ✅ maplibre-gl-compare | 実装済み |
+| サイドバイサイド表示 | ✅ DualMap plugin | ✅ st.columns(2) | 実装済み |
 | GeoJSONレイヤー | ✅ folium.GeoJson | ✅ addSource/addLayer | 実装済み |
 | カラーマップ | ✅ branca | ✅ branca | 実装済み |
-| ツールチップ | ✅ tooltip | ✅ Popup on hover | 実装済み |
-| フルスクリーン | ✅ Fullscreen plugin | ✅ FullscreenControl | 実装済み |
+| ツールチップ | ✅ tooltip | ✅ add_tooltip() | 実装済み |
 | ナビゲーション | ✅ 自動 | ✅ NavigationControl | 実装済み |
 | スケール | ✅ control_scale | ✅ ScaleControl | 実装済み |
-| ミニマップ | ✅ MiniMap plugin | ⚠️ 未実装 | 必要に応じて実装可能 |
 | カスタムタイル | ✅ tiles param | ✅ raster source | 実装済み |
+| マップ同期 | ✅ 自動同期 | ❌ 未実装 | 独立したマップ |
+| フルスクリーン | ✅ Fullscreen plugin | ❌ 未実装 | 必要に応じて実装可能 |
+| ミニマップ | ✅ MiniMap plugin | ❌ 未実装 | 必要に応じて実装可能 |
+| 凡例表示 | ✅ colormap.add_to() | ⚠️ キャプションのみ | st.subheaderで表示 |
 
 ## 主な変更点 (Key Changes)
 
@@ -74,8 +80,9 @@ html_output = create_dual_map_html(
 - 左右のマップが自動的に同期
 
 **MapLibre:**
-- カスタムHTMLで`maplibre-gl-compare`ライブラリを使用
-- JavaScriptで左右のマップを作成し、Compareクラスで同期
+- 2つの独立した`Map`インスタンスを作成
+- `st.columns(2)`で左右に並べて表示
+- マップ同期は未実装（独立して操作可能）
 
 ### 2. 座標の順序 (Coordinate Order)
 
@@ -96,8 +103,14 @@ html(m_html, height=600)
 
 **MapLibre:**
 ```python
-html_output = create_dual_map_html(...)
-html(html_output, height=600)
+map1 = create_single_map(...)
+map2 = create_single_map(...)
+
+col1, col2 = st.columns(2)
+with col1:
+    st_maplibre(map1, height=500)
+with col2:
+    st_maplibre(map2, height=500)
 ```
 
 ### 4. スタイリング
@@ -109,6 +122,7 @@ html(html_output, height=600)
 **MapLibre:**
 - GeoJSONのpropertiesにカラー情報を追加
 - MapLibreの`['get', 'color']`式で参照
+- maplibre Python APIを使用してPythonのみで実装
 
 **注意**: 現在の実装ではカラーマップのキャプションがハードコードされています（"滞在人口"と"増減率"）。より汎用的な実装にするには、これらをパラメータとして渡すことを検討してください。
 
@@ -121,12 +135,14 @@ html(html_output, height=600)
 3. **モダン**: 最新のマッピング技術を使用
 4. **オープンソース**: MapLibre GLは完全なオープンソース
 5. **カスタマイズ性**: より柔軟なスタイリングが可能
+6. **シンプル**: Python APIのみで実装、カスタムHTMLやJavaScriptは不要
 
 ### Foliumの利点
 
 1. **簡単**: Pythonだけで完結
 2. **豊富なプラグイン**: 多くの既存プラグイン
 3. **安定性**: 長い開発履歴
+4. **自動同期**: DualMapで自動的にマップが同期
 
 ## 移行手順 (Migration Steps)
 
@@ -209,9 +225,7 @@ streamlit run app/main.py
 
 ✅ **MapLibreへの移行は可能です**
 
-現在のデュアルマップ機能を完全に維持したまま、FoliumからMapLibreに置き換えることができます。主な機能はすべて実装済みで、パフォーマンスとモダンな技術スタックの利点があります。
-
-ただし、ミニマップ機能は現在未実装です。必要に応じて追加実装が可能です。
+FoliumからMapLibreに置き換えることができます。現在の実装では2つの独立したマップを並べて表示する形式です。主な機能は実装済みですが、マップ同期機能は未実装です。パフォーマンスとモダンな技術スタックの利点があります。
 
 ## 次のステップ (Next Steps)
 
@@ -220,11 +234,11 @@ streamlit run app/main.py
 3. ⬜ 実データでのテスト
 4. ⬜ パフォーマンステスト
 5. ⬜ ユーザーフィードバックの収集
-6. ⬜ 移行の決定
+6. ⬜ 必要に応じてマップ同期機能の追加
+7. ⬜ 移行の決定
 
 ## 参考資料 (References)
 
 - [MapLibre GL JS](https://maplibre.org/maplibre-gl-js-docs/api/)
-- [maplibre-gl-compare](https://github.com/maplibre/maplibre-gl-compare)
-- [Folium Documentation](https://python-visualization.github.io/folium/)
 - [maplibre Python Package](https://pypi.org/project/maplibre/)
+- [Folium Documentation](https://python-visualization.github.io/folium/)

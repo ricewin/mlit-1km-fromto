@@ -33,23 +33,20 @@
 │  maplibre_map_builder(df, gdf_1, gdf_2, ...)                   │
 │       ↓                                                           │
 │  ┌─────────────────────────────────────┐                        │
-│  │  create_dual_map_html()             │                        │
-│  │  - Convert GeoDataFrame → GeoJSON   │                        │
-│  │  - Apply colormaps to properties     │                        │
-│  │  - Generate custom HTML              │                        │
-│  │  - [lon, lat] coordinates            │                        │
+│  │  create_single_map() x 2            │                        │
+│  │  - Map(), MapOptions()              │                        │
+│  │  - GeoJSONSource, Layer             │                        │
+│  │  - add_tooltip(), add_control()     │                        │
+│  │  - [lon, lat] coordinates           │                        │
 │  └─────────────────────────────────────┘                        │
 │       ↓                                                           │
 │  ┌─────────────────────────────────────┐                        │
-│  │  Custom HTML Template               │                        │
-│  │  ├── maplibre-gl.js (v4.0.0)       │                        │
-│  │  ├── maplibre-gl-compare.js        │                        │
-│  │  ├── Two Map instances              │                        │
-│  │  ├── GeoJSON layers                 │                        │
-│  │  └── Synchronized controls          │                        │
+│  │  st.columns(2)                      │                        │
+│  │  ├── col1: st_maplibre(map1)       │                        │
+│  │  └── col2: st_maplibre(map2)       │                        │
 │  └─────────────────────────────────────┘                        │
 │       ↓                                                           │
-│  Streamlit Display (html component)                              │
+│  Streamlit Display (iframe via st_maplibre)                      │
 │                                                                   │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -84,23 +81,27 @@
              ↓
     ┌────────────────────────┐
     │  Convert to GeoJSON    │
+    │  (via __geo_interface__)│
     └────────┬───────────────┘
              │
              ↓
     ┌────────────────────────┐
-    │  Inject into HTML      │
-    │  template with:        │
-    │  - Map configurations  │
-    │  - Layer definitions   │
-    │  - Event handlers      │
+    │  Create Map objects    │
+    │  with maplibre Python  │
+    │  - Map(MapOptions)     │
+    │  - add_source()        │
+    │  - add_layer()         │
+    │  - add_tooltip()       │
+    │  - add_control()       │
     └────────┬───────────────┘
              │
              ↓
     ┌────────────────────────┐
-    │  Render in Browser     │
-    │  - Left map (before)   │
-    │  - Right map (after)   │
-    │  - Synchronized views  │
+    │  Render in Streamlit   │
+    │  - st.columns(2)       │
+    │  - st_maplibre(map1)   │
+    │  - st_maplibre(map2)   │
+    │  (Independent maps)    │
     └────────────────────────┘
 ```
 
@@ -112,44 +113,42 @@
 def format_tooltip(value, value_name, caption):
     # Helper function for tooltip formatting
     
-def create_dual_map_html(gdf_1, gdf_2, ...):
-    # Convert GeoDataFrames to GeoJSON
-    # Add color and tooltip properties
-    # Generate HTML with JavaScript code
+def create_single_map(gdf, value, colormap, map_center, zoom_start):
+    # Create a single map using maplibre Python package
+    # - Create Map with MapOptions
+    # - Add GeoJSONSource
+    # - Add fill and line Layers
+    # - Add tooltip
+    # - Add NavigationControl and ScaleControl
+    # Returns Map object
     
 def maplibre_map_builder(df, gdf_1, gdf_2, ...):
     # Main entry point
-    # Same interface as folium_map_builder
+    # - Calculate map center
+    # - Create two colormaps
+    # - Create two columns with st.columns(2)
+    # - Render each map with st_maplibre()
 ```
 
-### 2. JavaScript Layer (in HTML template)
+### 2. Rendering (No JavaScript Layer)
 
-```javascript
-// Two MapLibre GL JS instances
-var beforeMap = new maplibregl.Map({...});
-var afterMap = new maplibregl.Map({...});
-
-// Add GeoJSON sources and layers
-beforeMap.addSource('geojson1', {...});
-afterMap.addSource('geojson2', {...});
-
-// Add interactive features
-beforeMap.on('mousemove', 'geojson1-fill', ...);
-
-// Synchronize with maplibre-gl-compare
-var compare = new maplibregl.Compare(beforeMap, afterMap);
-```
+The implementation uses the maplibre Python package exclusively:
+- No custom HTML generation
+- No JavaScript code
+- Uses `st_maplibre()` from `maplibre.streamlit` for rendering
+- Each map is rendered independently in its own iframe
 
 ## Feature Mapping
 
 | Feature | Folium | MapLibre | Notes |
 |---------|--------|----------|-------|
-| Map initialization | `folium.DualMap()` | `maplibregl.Map()` x2 | Two separate instances |
-| Synchronization | Built-in | `maplibre-gl-compare` | External library |
-| GeoJSON | `folium.GeoJson()` | `addSource() + addLayer()` | More control |
+| Map initialization | `folium.DualMap()` | `Map(MapOptions())` x2 | Two separate instances |
+| Synchronization | Built-in | None | Maps are independent |
+| GeoJSON | `folium.GeoJson()` | `add_source() + add_layer()` | More control |
 | Styling | `style_function` | Data-driven expressions | Properties-based |
-| Tooltips | `tooltip` parameter | Popup on events | Event-driven |
-| Controls | Auto + plugins | Manual addition | More flexible |
+| Tooltips | `tooltip` parameter | `add_tooltip()` method | Built into Map class |
+| Controls | Auto + plugins | `add_control()` method | Manual addition |
+| Rendering | `m.get_root().render()` | `st_maplibre(map)` | Streamlit component |
 
 ## Performance Characteristics
 
@@ -159,6 +158,7 @@ Folium:
 - Python generates all HTML
 - Larger initial payload
 - Good for small datasets
+- Auto-synchronized maps
 
 MapLibre:
 - Client-side rendering  
@@ -166,6 +166,7 @@ MapLibre:
 - Smaller payload (JSON data)
 - Excellent for large datasets
 - Smoother interactions
+- Independent maps (no sync)
 ```
 
 ## Coordinate System Difference
@@ -179,3 +180,45 @@ MapLibre:   [lon, lat]  e.g., [139.767, 35.681]
 ```
 
 This is clearly documented in the code with comments.
+
+## Implementation Details
+
+### Current Implementation Features
+
+**Implemented:**
+- ✅ Two separate single maps displayed side-by-side
+- ✅ GSI tile layer (地理院タイル)
+- ✅ GeoJSON rendering with color styling
+- ✅ Interactive tooltips on hover
+- ✅ Navigation controls (zoom, pan)
+- ✅ Scale control
+- ✅ Colormap integration with branca
+- ✅ Caption display (via st.subheader)
+
+**Not Implemented:**
+- ❌ Map synchronization (maps are independent)
+- ❌ Fullscreen control
+- ❌ Visual colormap legend on maps
+- ❌ MiniMap
+
+### Code Structure
+
+```python
+# Simplified structure
+import streamlit as st
+from maplibre import Map, MapOptions, Layer, LayerType
+from maplibre.sources import GeoJSONSource
+from maplibre.controls import NavigationControl, ScaleControl
+from maplibre.streamlit import st_maplibre
+
+# Create map
+m = Map(MapOptions(center=(lon, lat), zoom=12, style={...}))
+m.add_source("geojson", GeoJSONSource(data=gdf.__geo_interface__))
+m.add_layer(Layer(id="fill", type=LayerType.FILL, ...))
+m.add_tooltip("fill", "tooltip")
+m.add_control(NavigationControl())
+m.add_control(ScaleControl())
+
+# Render
+st_maplibre(m, height=500)
+```
