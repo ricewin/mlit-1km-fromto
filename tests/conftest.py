@@ -11,6 +11,10 @@ app_dir = Path(__file__).parent.parent / "app"
 sys.path.insert(0, str(app_dir))
 
 
+# Note: The following fixtures are prepared for future integration tests.
+# They provide common test data structures used across multiple test files.
+
+
 @pytest.fixture
 def sample_dataframe():
     """Fixture providing a sample DataFrame for testing"""

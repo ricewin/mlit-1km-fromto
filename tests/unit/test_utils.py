@@ -4,13 +4,6 @@ import pandas as pd
 import pytest
 from shapely.geometry import Polygon
 
-import sys
-from pathlib import Path
-
-# Add app directory to Python path
-app_dir = Path(__file__).parent.parent.parent / "app"
-sys.path.insert(0, str(app_dir))
-
 from common.utils import lonlat_to_polygon, make_polygons, merge_df
 
 
