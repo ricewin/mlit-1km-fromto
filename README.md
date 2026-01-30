@@ -41,21 +41,25 @@ Tiles: [GSI](https://maps.gsi.go.jp/development/ichiran.html)
 This project uses pytest for testing. See [tests/README.md](tests/README.md) for detailed testing strategy and documentation.
 
 **Run all tests:**
+
 ```bash
 pytest
 ```
 
 **Run with verbose output:**
+
 ```bash
 pytest -v
 ```
 
 **Run unit tests only:**
+
 ```bash
 pytest tests/unit/
 ```
 
 **Run with coverage:**
+
 ```bash
 pytest --cov=app --cov-report=html
 ```
@@ -63,11 +67,13 @@ pytest --cov=app --cov-report=html
 ### Installing Dependencies
 
 Using Poetry:
+
 ```bash
 poetry install
 ```
 
 Or using pip:
+
 ```bash
 pip install -r requirements.txt
 pip install pytest  # for development
