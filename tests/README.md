@@ -176,7 +176,7 @@ To integrate with CI/CD:
            run: poetry run pytest
    ```
 
-1. **Pre-commit Hooks**
+2. **Pre-commit Hooks**
    - Run tests before commits
    - Enforce code quality standards
 
