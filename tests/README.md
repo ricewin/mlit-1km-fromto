@@ -161,18 +161,18 @@ To integrate with CI/CD:
    name: Tests
    on: [push, pull_request]
    jobs:
-   test:
+     test:
        runs-on: ubuntu-latest
        steps:
-       - uses: actions/checkout@v2
-       - uses: actions/setup-python@v2
+         - uses: actions/checkout@v2
+         - uses: actions/setup-python@v2
            with:
-           python-version: "3.12"
-       - name: Install dependencies
+             python-version: "3.12"
+         - name: Install dependencies
            run: |
-           pip install poetry
-           poetry install
-       - name: Run tests
+             pip install poetry
+             poetry install
+         - name: Run tests
            run: poetry run pytest
    ```
 
