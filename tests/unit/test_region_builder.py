@@ -1,6 +1,5 @@
 """Unit tests for app/common/region_builder.py"""
 
-import pandas as pd
 import pytest
 
 from app.common.region_builder import prefcode_to_name
@@ -31,11 +30,15 @@ class TestPrefcodeToName:
 
         # Check that all keys are integers (prefcodes)
         for key in pref_dict.keys():
-            assert isinstance(key, int), f"Expected int key, got {type(key).__name__}: {key}"
+            assert isinstance(key, int), (
+                f"Expected int key, got {type(key).__name__}: {key}"
+            )
 
         # Check that all values are strings (prefnames)
         for value in pref_dict.values():
-            assert isinstance(value, str), f"Expected str value, got {type(value).__name__}: {value}"
+            assert isinstance(value, str), (
+                f"Expected str value, got {type(value).__name__}: {value}"
+            )
 
     @pytest.mark.unit
     def test_city_dict_structure(self):
@@ -47,11 +50,15 @@ class TestPrefcodeToName:
 
         # Check that all keys are integers (citycodes)
         for key in city_dict.keys():
-            assert isinstance(key, int), f"Expected int key, got {type(key).__name__}: {key}"
+            assert isinstance(key, int), (
+                f"Expected int key, got {type(key).__name__}: {key}"
+            )
 
         # Check that all values are strings (citynames)
         for value in city_dict.values():
-            assert isinstance(value, str), f"Expected str value, got {type(value).__name__}: {value}"
+            assert isinstance(value, str), (
+                f"Expected str value, got {type(value).__name__}: {value}"
+            )
 
     @pytest.mark.unit
     def test_caching(self):
