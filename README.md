@@ -75,7 +75,7 @@ Or using pip:
 
 ```bash
 pip install -r requirements.txt
-pip install pytest  # for development
+pip install pytest pytest-cov  # for development
 ```
 
 [^1]: 出典：[「全国の人流オープンデータ」（国土交通省）](https://www.geospatial.jp/ckan/dataset/mlit-1km-fromto)
