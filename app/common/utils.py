@@ -22,13 +22,13 @@ from streamlit.runtime.state.session_state_proxy import SessionStateProxy
 def _unzip_csv(path: str) -> pd.DataFrame:
     """
     Fetch and unzip CSV data from blob storage.
-    
+
     Args:
         path: Relative path to the ZIP file in blob storage
-        
+
     Returns:
         DataFrame containing the CSV data
-        
+
     Raises:
         requests.RequestException: If the HTTP request fails
         zipfile.BadZipFile: If the downloaded content is not a valid ZIP file
@@ -53,7 +53,7 @@ def _unzip_csv(path: str) -> pd.DataFrame:
                     with z.open(filename) as csv_file:
                         df: pd.DataFrame = pd.read_csv(csv_file)
                         return df
-            
+
             # No CSV found in the archive
             raise ValueError("No CSV file found in ZIP archive")
     except zipfile.BadZipFile as e:
@@ -63,11 +63,11 @@ def _unzip_csv(path: str) -> pd.DataFrame:
 def fetch_data(f: str, year: int) -> pd.DataFrame:
     """
     Fetch data based on the specified parameters.
-    
+
     Args:
         f: Data type (e.g., "mesh1km", etc.)
         year: Year of the data
-        
+
     Returns:
         DataFrame containing the fetched data
     """
@@ -95,7 +95,9 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
         st.error("データの取得に失敗しました: ファイル形式が正しくありません")
         st.stop()
     except ValueError:
-        st.error("データの取得に失敗しました: ファイルに必要なデータが見つかりませんでした")
+        st.error(
+            "データの取得に失敗しました: ファイルに必要なデータが見つかりませんでした"
+        )
         st.stop()
 
 
