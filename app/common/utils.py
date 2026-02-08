@@ -20,7 +20,9 @@ from streamlit.runtime.state.session_state_proxy import SessionStateProxy
 
 @st.cache_data(show_spinner="unzip...")
 def _unzip_csv(path: str) -> pd.DataFrame:
-    url = f"{st.secrets.blob.url}{path}?{st.secrets.blob.token}"
+    base = st.secrets.blob.url.rstrip("/")
+    clean_path = path.lstrip("/")
+    url = f"{base}/{clean_path}?{st.secrets.blob.token.lstrip('?')}"
 
     try:
         response: requests.Response = requests.get(url, timeout=10)
@@ -46,16 +48,16 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
 
     if f == "mesh1km":
         if year == 2019:
-            path = "/attribute/attribute_mesh1km_2019.csv.zip"
+            path = "attribute/attribute_mesh1km_2019.csv.zip"
         else:
-            path = "/attribute/attribute_mesh1km_2020.csv.zip"
+            path = "attribute/attribute_mesh1km_2020.csv.zip"
     else:
         pcode = list(ss.pref)[0]
 
         if ss.set == "mdp":
-            path = f"/{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_mesh1km.csv.zip"
+            path = f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_mesh1km.csv.zip"
         elif ss.set == "fromto":
-            path = f"/{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
+            path = f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
 
     return _unzip_csv(path)
 
