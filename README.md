@@ -33,4 +33,49 @@ Apps: [Streamlit](https://www.bing.com/ck/a?!&&p=c725e9c25297ac2c98af541823ce226
 Maps: [Folium](https://python-visualization.github.io/folium/latest/)
 Tiles: [GSI](https://maps.gsi.go.jp/development/ichiran.html)
 
+## Development
+
+### Testing
+
+This project uses pytest for testing. See [tests/README.md](tests/README.md) for detailed testing strategy and documentation.
+
+**Run all tests:**
+
+```bash
+pytest
+```
+
+**Run with verbose output:**
+
+```bash
+pytest -v
+```
+
+**Run unit tests only:**
+
+```bash
+pytest tests/unit/
+```
+
+**Run with coverage:**
+
+```bash
+pytest --cov=app --cov-report=html
+```
+
+### Installing Dependencies
+
+Using Poetry:
+
+```bash
+poetry install
+```
+
+Or using pip:
+
+```bash
+pip install -r requirements.txt
+pip install pytest pytest-cov  # for development
+```
+
 [^1]: 出典：[「全国の人流オープンデータ」（国土交通省）](https://www.geospatial.jp/ckan/dataset/mlit-1km-fromto)
