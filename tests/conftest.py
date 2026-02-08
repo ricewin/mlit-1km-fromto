@@ -41,7 +41,7 @@ def clear_streamlit_cache():
         # Try to clear the cache if it exists
         if hasattr(st, 'cache_data') and hasattr(st.cache_data, 'clear'):
             st.cache_data.clear()
-    except:
+    except Exception:
         pass
     yield
 

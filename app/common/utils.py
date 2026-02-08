@@ -88,7 +88,13 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
 
     try:
         return _unzip_csv(path)
-    except (requests.RequestException, zipfile.BadZipFile, ValueError) as e:
+    except requests.RequestException:
+        st.error("データの取得に失敗しました: ネットワークエラーが発生しました")
+        st.stop()
+    except zipfile.BadZipFile:
+        st.error("データの取得に失敗しました: ファイル形式が正しくありません")
+        st.stop()
+    except ValueError as e:
         st.error(f"データの取得に失敗しました: {e}")
         st.stop()
 
