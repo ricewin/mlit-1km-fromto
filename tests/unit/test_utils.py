@@ -2,7 +2,7 @@
 
 import zipfile
 from io import BytesIO
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pandas as pd
 import pytest
