@@ -9,8 +9,7 @@ import pytest
 import requests
 from shapely.geometry import Polygon
 
-
-# Need to patch st.cache_data before importing utils
+# Patch st.cache_data before importing utils to bypass caching in tests
 with patch('streamlit.cache_data', lambda **kwargs: lambda func: func):
     from app.common.utils import _unzip_csv, lonlat_to_polygon, make_polygons, merge_df
 

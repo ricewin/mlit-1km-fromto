@@ -55,9 +55,9 @@ def _unzip_csv(path: str) -> pd.DataFrame:
                         return df
             
             # No CSV found in the archive
-            raise ValueError(f"No CSV file found in ZIP archive at {path}")
+            raise ValueError("No CSV file found in ZIP archive")
     except zipfile.BadZipFile as e:
-        raise zipfile.BadZipFile(f"Invalid ZIP file downloaded from {path}") from e
+        raise zipfile.BadZipFile("Invalid ZIP file downloaded") from e
 
 
 def fetch_data(f: str, year: int) -> pd.DataFrame:
