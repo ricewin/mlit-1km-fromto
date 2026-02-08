@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
@@ -9,6 +10,40 @@ import pytest
 # Add app directory to Python path
 app_dir = Path(__file__).parent.parent / "app"
 sys.path.insert(0, str(app_dir))
+
+
+@pytest.fixture(autouse=True)
+def mock_streamlit_cache():
+    """Mock streamlit cache_data decorator to bypass caching in tests"""
+    import streamlit as st
+    
+    # Save original decorator
+    original_cache_data = st.cache_data
+    
+    # Replace with a no-op decorator
+    st.cache_data = lambda **kwargs: lambda func: func
+    
+    # Clear any existing caches
+    if hasattr(st.cache_data, 'clear'):
+        st.cache_data.clear()
+    
+    yield
+    
+    # Restore original decorator
+    st.cache_data = original_cache_data
+
+
+@pytest.fixture(autouse=True)
+def clear_streamlit_cache():
+    """Clear Streamlit cache before each test"""
+    try:
+        import streamlit as st
+        # Try to clear the cache if it exists
+        if hasattr(st, 'cache_data') and hasattr(st.cache_data, 'clear'):
+            st.cache_data.clear()
+    except:
+        pass
+    yield
 
 
 # Note: The following fixtures are prepared for future integration tests.
