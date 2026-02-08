@@ -23,27 +23,10 @@ def mock_streamlit_cache():
     # Replace with a no-op decorator
     st.cache_data = lambda **kwargs: lambda func: func
     
-    # Clear any existing caches
-    if hasattr(st.cache_data, 'clear'):
-        st.cache_data.clear()
-    
     yield
     
     # Restore original decorator
     st.cache_data = original_cache_data
-
-
-@pytest.fixture(autouse=True)
-def clear_streamlit_cache():
-    """Clear Streamlit cache before each test"""
-    try:
-        import streamlit as st
-        # Try to clear the cache if it exists
-        if hasattr(st, 'cache_data') and hasattr(st.cache_data, 'clear'):
-            st.cache_data.clear()
-    except Exception:
-        pass
-    yield
 
 
 # Note: The following fixtures are prepared for future integration tests.

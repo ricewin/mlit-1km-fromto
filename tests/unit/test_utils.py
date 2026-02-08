@@ -62,7 +62,7 @@ class TestUnzipCsv:
     def test_url_construction_with_leading_slash(self, mock_get, mock_secrets):
         """Test URL construction when path has leading slash"""
         mock_secrets.blob.url = "https://example.com/data/"
-        mock_secrets.blob.token = "token=xyz"
+        mock_secrets.blob.token = "?token=xyz"
 
         # Create a mock CSV file in a ZIP
         csv_data = "id,value\n1,100\n"

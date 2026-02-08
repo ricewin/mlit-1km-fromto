@@ -94,8 +94,8 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
     except zipfile.BadZipFile:
         st.error("データの取得に失敗しました: ファイル形式が正しくありません")
         st.stop()
-    except ValueError as e:
-        st.error(f"データの取得に失敗しました: {e}")
+    except ValueError:
+        st.error("データの取得に失敗しました: ファイルに必要なデータが見つかりませんでした")
         st.stop()
 
 
