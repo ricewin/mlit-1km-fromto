@@ -65,7 +65,8 @@ def fetch_data(f: str, year: int) -> pd.DataFrame:
     Fetch data based on the specified parameters.
 
     Args:
-        f: Data type (e.g., "mesh1km", etc.)
+        f: Dataset identifier. Use "mesh1km" for attribute data, or dataset keys
+           such as "mdp" or "fromto" that are used to build the blob storage path.
         year: Year of the data
 
     Returns:
