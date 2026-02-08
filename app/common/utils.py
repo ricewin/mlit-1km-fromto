@@ -19,9 +19,16 @@ from streamlit.runtime.state.session_state_proxy import SessionStateProxy
 
 
 @st.cache_data(show_spinner="unzip...")
-def _unzip_csv(url: str) -> pd.DataFrame:
-    response: requests.Response = requests.get(url)
-    f = BytesIO(response.content)
+def _unzip_csv(path: str) -> pd.DataFrame:
+    url = f"{st.secrets.blob.url}{path}?{st.secrets.blob.token}"
+
+    try:
+        response: requests.Response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        f = BytesIO(response.content)
+    except requests.RequestException:
+        st.error("データの取得に失敗しました")
+        return pd.DataFrame()
 
     with zipfile.ZipFile(f) as z:
         file_list: list[str] = z.namelist()
@@ -30,8 +37,6 @@ def _unzip_csv(url: str) -> pd.DataFrame:
             if filename.endswith(".csv"):
                 with z.open(filename) as csv_file:
                     df: pd.DataFrame = pd.read_csv(csv_file)
-                    # st.write(f"*CSV file: {filename}*")
-                    # st.write(df.head())
 
     return df
 
@@ -39,22 +44,19 @@ def _unzip_csv(url: str) -> pd.DataFrame:
 def fetch_data(f: str, year: int) -> pd.DataFrame:
     ss: SessionStateProxy = st.session_state
 
-    path = st.secrets.blob.url
-
     if f == "mesh1km":
         if year == 2019:
-            path += "attribute/attribute_mesh1km_2019.csv.zip"
+            path = "/attribute/attribute_mesh1km_2019.csv.zip"
         else:
-            path += "attribute/attribute_mesh1km_2020.csv.zip"
+            path = "/attribute/attribute_mesh1km_2020.csv.zip"
     else:
         pcode = list(ss.pref)[0]
 
         if ss.set == "mdp":
-            path += f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_mesh1km.csv.zip"
+            path = f"/{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_mesh1km.csv.zip"
         elif ss.set == "fromto":
-            path += f"{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
+            path = f"/{f}/{pcode:02}/{year}/{ss.month:02}/monthly_{f}_city.csv.zip"
 
-    path += st.secrets.blob.token
     return _unzip_csv(path)
 
 
